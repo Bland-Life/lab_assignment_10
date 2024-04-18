@@ -8,7 +8,7 @@
 // Trie structure
 struct Trie {
     int count;
-    struct Trie* alphabet[26];
+    struct Trie* alphabet[ALPHABET_LEN];
 };
 
 int readDictionary();
@@ -25,18 +25,17 @@ void insert(struct Trie *pTrie, char *word) {
     const int WORD_LEN = strlen(word);
     int letter_pos;
     
+    // Traverses the Trie, expanding it whenever it encounters a NULL
+    // position
     for (int i = 0; i < WORD_LEN; i++) {
 
         letter_pos = word[i] - 'a';
 
         if (temp->alphabet[letter_pos] == NULL) {
             temp->alphabet[letter_pos] = createTrie();
-            temp = temp->alphabet[letter_pos];
         }
 
-        else {
-            temp = temp->alphabet[letter_pos];
-        }
+        temp = temp->alphabet[letter_pos];
     }
 
     temp->count++;
@@ -49,6 +48,8 @@ int numberOfOccurances(struct Trie *pTrie, char *word) {
     const int WORD_LEN = strlen(word);
     int letter_pos;
 
+    // Traverses the Trie, ending early only if it encounters NULL
+    // at a position that should have a node for the word
     for (int i = 0; i < WORD_LEN; i++) {
 
         letter_pos = word[i] - 'a';
@@ -65,6 +66,7 @@ int numberOfOccurances(struct Trie *pTrie, char *word) {
 // deallocate the trie structure
 struct Trie *deallocateTrie(struct Trie *pTrie) {
 
+    // Recursive call on the children of the Trie node
     for (int i = 0; i < ALPHABET_LEN; i++) {
 
         if (pTrie->alphabet[i] != NULL) {
@@ -97,6 +99,7 @@ struct Trie *createTrie() {
 // this function will return number of words in the dictionary,
 // and read all the words in the dictionary to the structure words
 int readDictionary(char *filename, char **pInWords) {
+
     FILE* dictionary;
     if ((dictionary = fopen(filename, "r")) == NULL) {
         printf("Error opening dictionary.");
@@ -105,7 +108,9 @@ int readDictionary(char *filename, char **pInWords) {
 
     int num_of_words;
     fscanf(dictionary, "%d", &num_of_words);
+
     for (int i = 0; i < num_of_words; i++) {
+
         pInWords[i] = (char*) malloc(sizeof(char) * WORD_LENGTH);
         if (pInWords[i] == NULL) {
             printf("Error allocating allocating memory for words");
